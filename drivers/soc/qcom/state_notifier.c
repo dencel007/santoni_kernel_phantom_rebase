@@ -94,7 +94,7 @@ void state_suspend(void)
 
 	suspend_in_progress = true;
 
-	queue_delayed_work(susp_wq, &suspend_work,
+	queue_delayed_work_on(0, susp_wq, &suspend_work, 
 		msecs_to_jiffies(suspend_defer_time * 1000));
 }
 
@@ -111,9 +111,7 @@ void state_resume(void)
 static int __init state_notifier_init(void)
 {
 	susp_wq =
-	    alloc_workqueue("state_susp_wq",
-			    WQ_HIGHPRI | WQ_UNBOUND | WQ_MEM_RECLAIM, 0);
-
+	    alloc_workqueue("state_susp_wq", WQ_HIGHPRI, 0);
 	if (!susp_wq)
 		pr_err("State Notifier failed to allocate suspend workqueue\n");
 
