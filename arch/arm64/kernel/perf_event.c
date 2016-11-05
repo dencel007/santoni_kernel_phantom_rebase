@@ -1072,6 +1072,8 @@ static int armv8pmu_request_irq(struct arm_pmu *cpu_pmu, irq_handler_t handler)
 		}
 
 		on_each_cpu(armpmu_enable_percpu_irq, &irq, 1);
+		cpu_pmu->percpu_irq_requested = true;
+		cpu_pmu->percpu_irq = irq;
 	} else {
 		for (i = 0; i < irqs; ++i) {
 			err = 0;
@@ -1511,7 +1513,8 @@ static int __cpuinit cpu_pmu_notify(struct notifier_block *b,
 
 	switch (masked_action) {
 	case CPU_DOWN_PREPARE:
-		if (cpu_pmu->save_pm_registers)
+		if (pmu->percpu_irq_requested) {
+			int irq = pmu->percpu_irq;
 			smp_call_function_single(cpu,
 				cpu_pmu->save_pm_registers, hcpu, 1);
 		if (cpu_pmu->pmu_state != ARM_PMU_STATE_OFF) {
@@ -1529,22 +1532,12 @@ static int __cpuinit cpu_pmu_notify(struct notifier_block *b,
 
 	case CPU_STARTING:
 	case CPU_DOWN_FAILED:
-		/* Reset PMU to clear counters for ftrace buffer */
-		if (cpu_pmu->reset)
-			cpu_pmu->reset(NULL);
-		if (cpu_pmu->restore_pm_registers)
-			cpu_pmu->restore_pm_registers(hcpu);
-		if (cpu_pmu->pmu_state == ARM_PMU_STATE_RUNNING) {
-			/* Arm the PMU IRQ before appearing. */
-			if (cpu_pmu->plat_device) {
-				irq = cpu_pmu->percpu_irq;
-				armpmu_enable_percpu_irq(&irq);
-			}
-			if (cpu_has_active_perf(cpu)) {
-				armpmu_hotplug_enable(cpu_pmu);
-				pmu = &cpu_pmu->pmu;
-				pmu->pmu_enable(pmu);
-			}
+		if (pmu->reset)
+			pmu->reset(pmu);
+		if (pmu->percpu_irq_requested) {
+			int irq = pmu->percpu_irq;
+			smp_call_function_single(cpu,
+				armpmu_enable_percpu_irq, &irq, 1);
 		}
 		break;
 	}
