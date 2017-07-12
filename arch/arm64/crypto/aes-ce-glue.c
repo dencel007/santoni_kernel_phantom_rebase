@@ -16,6 +16,8 @@
 #include <linux/crypto.h>
 #include <linux/module.h>
 
+#include "aes-ce-setkey.h"
+
 MODULE_DESCRIPTION("Synchronous AES cipher using ARMv8 Crypto Extensions");
 MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
 MODULE_LICENSE("GPL v2");
@@ -168,7 +170,7 @@ static struct crypto_alg aes_alg = {
 	.cra_cipher = {
 		.cia_min_keysize	= AES_MIN_KEY_SIZE,
 		.cia_max_keysize	= AES_MAX_KEY_SIZE,
-		.cia_setkey		= crypto_aes_set_key,
+		.cia_setkey		= ce_aes_setkey,
 		.cia_encrypt		= aes_cipher_encrypt,
 		.cia_decrypt		= aes_cipher_decrypt
 	}
