@@ -36,6 +36,7 @@
 *.zip
 zImage
 AnyKernel2/zImage
+*.ll
 modules.builtin
 Module.symvers
 *.dwo
