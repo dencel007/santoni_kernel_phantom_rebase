@@ -5452,7 +5452,7 @@ static void smbchg_handle_hvdcp3_disable(struct smbchg_chip *chip)
 				pr_smb(PR_MISC, "init hvdcp_det_done\n");
 			}
 		}
-	} else {
+	 else {
 		smbchg_change_usb_supply_type(chip, POWER_SUPPLY_TYPE_UNKNOWN);
 	}
 }
