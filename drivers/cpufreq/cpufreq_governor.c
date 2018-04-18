@@ -38,7 +38,7 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 	struct ex_dbs_tuners *ex_tuners = dbs_data->tuners;
 	struct cpufreq_policy *policy;
 	unsigned int sampling_rate;
-	unsigned int max_load = 0;
+	unsigned int max_load = 0, deferred_periods = UINT_MAX;
 	unsigned int ignore_nice;
 	unsigned int j;
 
@@ -136,10 +136,21 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 		 * an unusually large 'wall_time' (as compared to the sampling
 		 * rate) indicates this scenario.
 		 */
-		if (unlikely(wall_time > (2 * sampling_rate)) &&
-						j_cdbs->copy_prev_load) {
+		if (unlikely(wall_time > (2 * sampling_rate) &&
+			     j_cdbs->prev_load)) {
+			unsigned int periods = wall_time / sampling_rate;
+
 			load = j_cdbs->prev_load;
-			j_cdbs->copy_prev_load = false;
+
+			if (periods < deferred_periods)
+				deferred_periods = periods;
+
+			/*
+			 * Perform a destructive copy, to ensure that we copy
+			 * the previous load only once, upon the first wake-up
+			 * from idle.
+			 */
+			j_cdbs->prev_load = 0;
 		} else {
 			load = 100 * (wall_time - idle_time) / wall_time;
 			j_cdbs->prev_load = load;
@@ -150,6 +161,7 @@ void dbs_check_cpu(struct dbs_data *dbs_data, int cpu)
 			max_load = load;
 	}
 
+	cdbs->deferred_periods = deferred_periods;
 	dbs_data->cdata->gov_check_cpu(cpu, max_load);
 }
 EXPORT_SYMBOL_GPL(dbs_check_cpu);
