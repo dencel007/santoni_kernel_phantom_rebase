@@ -60,12 +60,15 @@ MODULE_LICENSE("GPLv3");
 #define DT2W_PWRKEY_DUR		60
 #define DT2W_TIME		400
 #define DT2W_RADIUS		200
+#define VIB_STRENGTH	20
 
 #define DT2W_OFF 0
 #define DT2W_ON 1
 #define DT2W_FS 2
 
 /* Resources */
+extern void set_vibrate(int value);
+static int dt2w_vib_strength = VIB_STRENGTH;
 int dt2w_switch = DT2W_DEFAULT;
 bool dt2w_scr_suspended = false;
 bool in_phone_call = false;
@@ -200,7 +203,7 @@ static void detect_doubletap2wake(int x, int y)
 				hence >1 so the if statement down below will turn true
 				so it is better that we don't wait for the control to
 				go there, and we pwr_on it from here directly*/
-
+				set_vibrate(dt2w_vib_strength);
 				exec_count = false;
 				doubletap2wake_pwrtrigger();
 				doubletap2wake_reset();
@@ -414,6 +417,35 @@ static DEVICE_ATTR(doubletap2wake_feather, (S_IWUSR|S_IRUGO),
 	dt2w_feather_show, dt2w_feather_dump);
 	*/
 
+static ssize_t dt2w_vib_strength_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	size_t count = 0;
+
+	count += sprintf(buf, "%d\n", dt2w_vib_strength);
+
+	return count;
+}
+
+static ssize_t dt2w_vib_strength_dump(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	unsigned int new_dt2w_vib;
+
+	if (!sscanf(buf, "%du", &new_dt2w_vib))
+		return -EINVAL;
+
+	if (new_dt2w_vib == dt2w_vib_strength)
+		return count;
+	
+	dt2w_vib_strength = new_dt2w_vib;
+	
+	return count;
+}
+
+static DEVICE_ATTR(doubletap2wake_vibstrength, (S_IWUSR|S_IRUGO),
+	dt2w_vib_strength_show, dt2w_vib_strength_dump);
+
 static ssize_t dt2w_version_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -487,6 +519,12 @@ static int __init doubletap2wake_init(void)
 	if (rc) {
 		pr_warn("%s: sysfs_create_file failed for doubletap2wake_version\n", __func__);
 	}
+	
+	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake_vibstrength.attr);
+	if (rc) {
+		pr_warn("%s: sysfs_create_file failed for doubletap2wake_vibstrength\n", __func__);
+	}
+	
 	/*
 	rc = sysfs_create_file(android_touch_kobj, &dev_attr_doubletap2wake_feather.attr);
 	if (rc) {
