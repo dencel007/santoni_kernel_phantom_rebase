@@ -178,7 +178,7 @@ static void detect_sweep2wake(int x, int y)
 			}
 		}
 	//right->left
-	} else if ((is_display_on()) && (s2w_switch > 0)) {
+	} else if ((is_display_on()) && (s2w_switch < 0)) {
 		scr_on_touch=true;
 		prevx = (S2W_X_MAX - S2W_X_FINAL);
 		nextx = S2W_X_B2;
