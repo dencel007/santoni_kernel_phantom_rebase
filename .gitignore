@@ -33,6 +33,9 @@
 *.patch
 *.gcno
 *.ll
+*.zip
+zImage
+AnyKernel2/zImage
 modules.builtin
 Module.symvers
 *.dwo
@@ -45,6 +48,7 @@ Module.symvers
 /linux
 /vmlinux
 /vmlinuz
+/zImage
 /System.map
 /Module.markers
 /AnyKernel2/*
