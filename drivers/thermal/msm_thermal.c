@@ -78,7 +78,7 @@
 #define THERM_DDR_MASTER_ID  1
 #define THERM_DDR_SLAVE_ID   512
 #define THERM_DDR_IB_VOTE_REQ   366000000
-#define INTELLI_USER_FREQ 800000
+#define INTELLI_USER_FREQ 1000000
 
 #define VALIDATE_AND_SET_MASK(_node, _key, _mask, _cpu) \
 	do { \
