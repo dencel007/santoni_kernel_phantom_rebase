@@ -605,6 +605,8 @@ static struct clk_freq_tbl ftbl_gcc_venus0_vcodec0_clk_8937[] = {
 	F( 308570000,          gpll6,  3.5,    0,     0),
 	F( 320000000,          gpll0,  2.5,    0,     0),
 	F( 360000000,          gpll6,    3,    0,     0),
+	F( 360000000,          gpll6,    3,    0,     0),
+	F( 400000000,          gpll6,    3,    0,     0),
 	F_END
 };
 
@@ -4275,7 +4277,7 @@ static void override_for_8937(int speed_bin)
 	OVERRIDE_FTABLE(vcodec0, ftbl_gcc_venus0_vcodec0_clk, 8937);
 	OVERRIDE_FMAX5(vcodec0,
 		LOWER, 166150000, LOW, 240000000, NOMINAL, 308570000,
-		NOM_PLUS, 320000000, HIGH, 400000000); //Venus overclock
+		NOM_PLUS, 320000000, HIGH, 400000000);
 	OVERRIDE_FMAX2(sdcc1_apps, LOWER, 100000000,
 		NOMINAL, 400000000);
 }
