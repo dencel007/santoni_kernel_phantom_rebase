@@ -135,7 +135,7 @@ struct cpu_dbs_common_info {
 	u64 prev_cpu_idle;
 	u64 prev_cpu_wall;
 	u64 prev_cpu_nice;
-	unsigned int deferred_periods;
+	unsigned int prev_load;
 	/*
 	 * Flag to ensure that we copy the previous load only once, upon the
 	 * first wake-up from idle.
