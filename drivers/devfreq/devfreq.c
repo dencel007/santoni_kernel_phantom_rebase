@@ -820,11 +820,10 @@ static ssize_t governor_store(struct device *dev, struct device_attribute *attr,
 		return -EINVAL;
 
 	/* Governor white list */
-	if (strncmp(str_governor, "bw_hwmon", DEVFREQ_NAME_LEN) &&
-		strncmp(str_governor, "cpufreq", DEVFREQ_NAME_LEN) &&
+	if (strncmp(str_governor, "cpufreq", DEVFREQ_NAME_LEN) &&
 		strncmp(str_governor, "performance", DEVFREQ_NAME_LEN) &&
 		strncmp(str_governor, "powersave", DEVFREQ_NAME_LEN) &&
-		strncmp(str_governor, "mem_latency", DEVFREQ_NAME_LEN) &&
+		strncmp(str_governor, "simple_ondemand", DEVFREQ_NAME_LEN) &&
 		strncmp(str_governor, "msm-adreno-tz", DEVFREQ_NAME_LEN))
 		return -EINVAL;
 
